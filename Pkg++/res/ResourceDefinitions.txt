@@ -1,0 +1,3 @@
+﻿System.Drawing.Image SolutionIcon Pkg__.res.solution.png
+System.Drawing.Icon RemoveIcon Pkg__.res.remove.ico
+System.Drawing.Image icon_home Pkg__.res.icon_home.png

@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,21 +16,39 @@ using VCXProjInterface.LibraryAdder;
 
 namespace Pkg__
 {
+
     public partial class ProjView : Form
     {
         public ProjView()
         {
             InitializeComponent();
-            label1.CenterOnContainerX();
             SetAvaliableLibraries(LibraryCollection.Load("libs.xml"));
             Menu = new MainMenu();
-            Menu.MenuItems.Add("Files", new MenuItem[]
+            Menu.MenuItems.Add("Project", new MenuItem[]
             {
-                new MenuItem("Apply changes", new EventHandler(OnApplyChanges))
+                new("Apply changes", new EventHandler(OnApplyChanges)),
+                new("Close", (o, e) => Close())
             });
+            grid.CellContentClick += grid_CellContentClick;
             grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             CheckedItems = new List<bool>();
+
+            grid.DefaultCellStyle = new DataGridViewCellStyle()
+            {
+                Alignment = DataGridViewContentAlignment.MiddleCenter,
+                Font = new Font("Segoe UI", 9.25f),
+                BackColor = Color.White,
+                ForeColor = Color.Black,
+                SelectionBackColor = Color.Cyan,
+                SelectionForeColor = Color.Black,
+            };
+            grid.AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle()
+            {
+                BackColor = Color.WhiteSmoke
+            };
         }
+
+
         public List<bool> CheckedItems;
         public void OnApplyChanges(object sender, EventArgs e)
         {
@@ -47,29 +67,17 @@ namespace Pkg__
 
             var projDir = new FileInfo(currentProj.ProjectPath).DirectoryName;
             var depDir = Path.Combine(projDir, "deps");
-            var p_path = currentProj.ProjectPath + "_mod.vcxproj";
+            var project_path = currentProj.ProjectPath /*+ "_mod.vcxproj"*/;
             foreach (var to_remove in remove)
             {
                 if (HasLib(to_remove) == false) continue;
-                p_path.RemoveLibraryFromFile(to_remove, GetRelLibDir(ref currentProj, to_remove, depDir));
-                if (Directory.Exists(GetLibDir(to_remove, depDir)))
-                {
-                    Directory.Delete(GetLibDir(to_remove, depDir), true);
-                }
+                lib_manager.RemoveLib(project_path, to_remove, ref currentProj, depDir);
             }
-            FolderCopyForm copier;
+            FolderCopyForm copier = null;
             foreach (var to_install in install)
             {
                 if (HasLib(to_install)) continue;
-                p_path.AddLibraryToFile(to_install, GetRelLibDir(ref currentProj, to_install, depDir));
-#if true
-                copier = new FolderCopyForm();
-                copier.Text = "Installing " + to_install.Name + " - Version " + to_install.Version;
-                copier.CopyFolder(to_install.LibraryPath, Path.Combine(
-                    depDir,
-                    to_install.Name + "-" + to_install.Version));
-                copier.ShowDialog();
-#endif
+                lib_manager.InstallLib(to_install, ref currentProj, project_path, depDir, ref copier);
             }
 
             currentProj.InstalledLibraries.Libraries = newLibs.ToArray();
@@ -79,6 +87,11 @@ namespace Pkg__
             MessageBox.Show("Changes applied successfully!", "Apply Changes", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         }
+        
+
+
+
+
         bool HasLib(Library lib)
         {
             for (int i = 0; i < currentProj.InstalledLibraries.Libraries.Length; i++)
@@ -87,17 +100,7 @@ namespace Pkg__
             }
             return false;
         }
-        private string GetRelLibDir(ref Project proj, Library lib, string depDir)
-        {
-            var info = new FileInfo(proj.ProjectPath);
-            var parentDir = info.Directory;
-            var libDir = GetLibDir(lib, depDir);
-            return libDir.Substring(parentDir.FullName.Length+1);
-        }
-        private string GetLibDir(Library lib, string depDir)
-        {
-            return Path.Combine(depDir, lib.Name + "-" + lib.Version);
-        }
+
         public Library[] GetToBeRemoved()
         {
             List<Library> libraries = new List<Library>();
@@ -158,23 +161,12 @@ namespace Pkg__
                 var installed = LibraryInstalled(row);
                 CheckedItems.Add(installed);
                 row.Cells[row.Cells.Count - 1].Value = installed;
-                    
             }
-            label1.Text = proj.ProjectName;
+            Text = $"[Project View] -> {currentProj.ParentSolution.SolutionName} -> {currentProj.ProjectName}";
         }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void grid_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
         private void grid_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+            var cell = grid[e.ColumnIndex, e.RowIndex];
             if (e.ColumnIndex == grid.ColumnCount - 1)
             {
                 CheckedItems[e.RowIndex] = !CheckedItems[e.RowIndex];

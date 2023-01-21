@@ -26,6 +26,7 @@ namespace VCXProjInterface
                     projects.Add(LoadProject(line, solDir));
                 }
             }
+            SolutionName = new FileInfo(path).Name.Substring(0, new FileInfo(path).Name.Length-new FileInfo(path).Extension.Length);
             Projects = projects.ToArray();
         }
 
@@ -47,14 +48,16 @@ namespace VCXProjInterface
             var ProjectPath = Path.Combine(solutionDir, result.Groups[3].Value);
             var ProjectGUID = result.Groups[4].Value;
 
-            return Project.Deserialize(ProjectPath, ProjectName, ProjectGUID);
-
+            var proj = Project.Deserialize(ProjectPath, ProjectName, ProjectGUID);
+            proj.ParentSolution = this;
+            return proj;
             //if (!result.Success) throw new Exception("Invalid data");
             //SolutionGUID = result.Groups[1].Value;
             //SolutionDir = solutionDir;
         }
         public Solution() { }
         public Project[] Projects { get; set; }
+        public string SolutionName { get; }
         public string SolutionGUID { get; }
         public string SolutionDir { get; }
     }

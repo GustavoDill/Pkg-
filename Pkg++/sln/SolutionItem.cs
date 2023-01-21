@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,17 +15,39 @@ namespace Pkg__
         public SolutionItem()
         {
             Size = new Size(240, 48);
+            // Normal
+            // Hover
+            // Selected
+            // SelectedHover
             colors = new Color[4]
             {
-                Color.White,
-                Color.Gray,
-                Color.FromArgb(52, 52, 52),
-                Color.FromArgb(48, 48, 48),
+                Color.White, // Normal
+                Color.Gray, // Hover
+                Color.RoyalBlue, // Selected
+                Color.Blue, // SelectedHover
             };
+            secondColors = new Color[4]
+                {
+                    Color.Gainsboro,
+                    Color.DarkGray,
+                    Color.Cyan,
+                    Color.Cyan
+                };
+
             State = ItemState.Normal;
             //BackColor = Color.FromArgb(52, 52, 52);
             _iconRect = new Rectangle(8, 8,
                                       36 - 8, Height - 16);
+        }
+        public Color SecondBackColor { get; set; }
+        protected override void OnPaintBackground(PaintEventArgs pevent)
+        {
+            //base.OnPaintBackground(pevent);
+
+            var rect = ClientRectangle;
+            LinearGradientBrush brush = new LinearGradientBrush(rect, colors[(int)State], secondColors[(int)State], LinearGradientMode.ForwardDiagonal);
+
+            pevent.Graphics.FillRectangle(brush, rect);
         }
         protected override void OnMouseEnter(EventArgs e)
         {
@@ -73,7 +96,7 @@ namespace Pkg__
         {
             return Text;
         }
-        public bool Selected { get => _selected; set { _selected = value;  OnSelectedChanged(EventArgs.Empty); if (value) ItemSelected?.Invoke(this, EventArgs.Empty); } }
+        public bool Selected { get => _selected; set { _selected = value; OnSelectedChanged(EventArgs.Empty); if (value) ItemSelected?.Invoke(this, EventArgs.Empty); } }
         public ItemState State
         {
             get { return _state; }
@@ -88,6 +111,7 @@ namespace Pkg__
             SelectedHover
         }
         public Color[] colors;
+        public Color[] secondColors;
         public Image Icon { get; set; }
         private Rectangle _iconRect;
 
@@ -138,7 +162,7 @@ namespace Pkg__
                 default:
                     break;
             }
-                    State = state;
+            State = state;
         }
     }
 }

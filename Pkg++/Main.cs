@@ -23,6 +23,15 @@ namespace Pkg__
         public Main()
         {
             InitializeComponent();
+            Menu = new MainMenu(new MenuItem[]
+            {
+                new("File", new MenuItem[]
+                {
+                    new("Open solution", ((o,e)=> OpenSolution())),
+                    new("Close", (o, e) => Close())
+                })
+            });
+
 
             slnIcon = Manager.Resources["SolutionIcon"].Get<Image>();
             list.ItemSize = new Size(list.Width, new SolutionItem().Height);
@@ -52,7 +61,9 @@ namespace Pkg__
 
         void AddSln(string sln)
         {
-            var s = new SolutionItem() { Icon = slnIcon, Text = sln, Tag = list.Items.Length };
+            var s = new SolutionItem() { Icon = slnIcon, Text = sln, Tag = list.Items.Length, 
+                BackColor = Color.Cyan,
+                SecondBackColor = Color.RoyalBlue};
             s.DoubleClick += Sln_DoubleClick;
             s.ItemClick += S_ItemClick;
             list.AddItem(s);
@@ -98,27 +109,21 @@ namespace Pkg__
 
             Hide();
         }
-
-        private void smoothButton2_Click(object sender, EventArgs e)
-        {
-            //NavigateTo(typeof(SolutionView));
-        }
-
-        private void smoothButton1_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void smoothButton2_Click_1(object sender, EventArgs e)
-        {
-            //NavigateTo(typeof(SolutionView), "AAAA");
-        }
-
         private void smoothButton1_Click(object sender, EventArgs e)
         {
-
+            OpenSolution();
         }
+        void OpenSolution()
+        {
+            var ofd = new OpenFileDialog()
+            {
+                Filter = "Solution file (*.sln)|*.sln"
+            };
+            if (ofd.ShowDialog() == DialogResult.Cancel) return;
 
+            WriteRecentSln(ofd.FileName);
+            OpenSolution(ofd.FileName);
+        }
         FolderCopyForm c;
         private void smoothButton2_Click_2(object sender, EventArgs e)
         {

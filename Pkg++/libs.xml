@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LibraryCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 	<Library Name="wxWidgets" Version="3.2.1">
-		<LibraryPath>C:\libs\wxWidgets-3.2.1</LibraryPath>
+		<LibraryPath>C:\libs\wxWidgets-3.2.1\pkg_mgr</LibraryPath>
 		<Configuration Platform="Win32">
 			<LibPath>lib\vc_lib</LibPath>
 			<IncludePath>include\msvc</IncludePath>
@@ -13,7 +13,7 @@
 			<IncludePath>include</IncludePath>
 		</Configuration>
 	</Library>
-	<Library Name="SDL2" Version="2.26.1">
+	<!--<Library Name="SDL2" Version="2.26.1">
 		<LibraryPath>C:\libs\SDL2-2.26.1</LibraryPath>
 		<Configuration Platform="Win32">
 			<LibPath>VisualC\Win32\Release</LibPath>
@@ -34,7 +34,7 @@
 			<LibPath>contrib\vstudio\vc14\x64\ZlibStatRelease</LibPath>
 			<IncludePath></IncludePath>
 		</Configuration>
-	</Library>
+	</Library>-->
 	<!--<Library Name="ZLib (Dll)" Version="1.2.13">
 		<LibraryPath>C:\libs\zlib-1.2.13</LibraryPath>
 		<Configuration Platform="Win32">

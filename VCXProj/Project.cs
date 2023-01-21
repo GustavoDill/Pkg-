@@ -17,6 +17,8 @@ namespace VCXProjInterface
     public partial class Project
     {
         [XmlIgnore]
+        public Solution ParentSolution { get; set; }
+        [XmlIgnore]
         public string ProjectPath { get; set; }
         [XmlIgnore]
         public string ProjectGUID { get; set; }

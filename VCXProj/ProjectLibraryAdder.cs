@@ -105,11 +105,24 @@ namespace VCXProjInterface.LibraryAdder
                             foreach (var include in lib.Configurations[i].IncludePaths)
                                 add.Directories.Insert(0, Path.Combine(libDir, include));
                             line = $"{dir.Groups[1].Value}<AdditionalIncludeDirectories>{add.ToString()}</AdditionalIncludeDirectories>";
-                           
+                            break;
                         }
                     }
                 }
-
+                if (line.Contains("</ClCompile>")) // If no additional
+                {
+                    for (int i = 0; i < lib.Configurations.Length; i++)
+                    {
+                        if (lib.Configurations[i].Platform == current_config.Platform.ToString())
+                        {
+                            var add = new AdditionalIncludeDir();
+                            foreach (var include in lib.Configurations[i].IncludePaths)
+                                add.Directories.Insert(0, Path.Combine(libDir, include));
+                            line = $"\t\t\t<AdditionalIncludeDirectories>{add}</AdditionalIncludeDirectories>\n{line}";
+                            break;
+                        }
+                    }
+                }
                 if (line.Contains("AdditionalLibraryDirectories"))
                 {
                     // Changes to lib directories
@@ -123,7 +136,23 @@ namespace VCXProjInterface.LibraryAdder
                             foreach (var libPath in lib.Configurations[i].LibPaths)
                                 add.Directories.Insert(0, Path.Combine(libDir, libPath));
                             line = $"{dir.Groups[1].Value}<AdditionalLibraryDirectories>{add.ToString()}</AdditionalLibraryDirectories>";
-                            
+                            break;
+                        }
+                    }
+                }
+                if (line.Contains("</Link>"))
+                {
+                    for (int i = 0; i < lib.Configurations.Length; i++)
+                    {
+                        if (lib.Configurations[i].Platform == current_config.Platform.ToString())
+                        {
+                            var add = new AdditionalLibraryDir();
+                            foreach (var libPath in lib.Configurations[i].LibPaths)
+                                add.Directories.Insert(0, Path.Combine(libDir, libPath));
+
+                            line = $"\t\t\t<AdditionalLibraryDirectories>{add}</AdditionalLibraryDirectories>\n{line}";
+                            //line = add.ToString() + "\n" + line;
+                            break;
                         }
                     }
                 }

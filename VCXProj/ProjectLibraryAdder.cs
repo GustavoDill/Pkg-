@@ -38,7 +38,7 @@ namespace VCXProjInterface.LibraryAdder
                             var dir = Regex.Match(line, "(\\s+)<AdditionalIncludeDirectories>(.+)</AdditionalIncludeDirectories>");
                             var add = new AdditionalIncludeDir(dir.Groups[2].Value);
                             foreach (var include in lib.Configurations[i].IncludePaths)
-                                add.Directories.Remove(Path.Combine(libDir, include));
+                                add.Directories.Remove(Path.Combine(lib.LibraryPath, include));
                             line = $"{dir.Groups[1].Value}<AdditionalIncludeDirectories>{add}</AdditionalIncludeDirectories>";
 
                         }
@@ -56,7 +56,7 @@ namespace VCXProjInterface.LibraryAdder
                             var dir = Regex.Match(line, "(\\s+)<AdditionalLibraryDirectories>(.+)</AdditionalLibraryDirectories>");
                             var add = new AdditionalLibraryDir(dir.Groups[2].Value);
                             foreach (var libPath in lib.Configurations[i].LibPaths)
-                                add.Directories.Remove(Path.Combine(libDir, libPath));
+                                add.Directories.Remove(Path.Combine(lib.LibraryPath, libPath));
                             line = $"{dir.Groups[1].Value}<AdditionalLibraryDirectories>{add}</AdditionalLibraryDirectories>";
 
                         }
@@ -103,7 +103,10 @@ namespace VCXProjInterface.LibraryAdder
                             var dir = Regex.Match(line, "(\\s+)<AdditionalIncludeDirectories>(.+)</AdditionalIncludeDirectories>");
                             var add = new AdditionalIncludeDir(dir.Groups[2].Value);
                             foreach (var include in lib.Configurations[i].IncludePaths)
-                                add.Directories.Insert(0, Path.Combine(libDir, include));
+                            {
+                                var l = Path.Combine(lib.LibraryPath, include);
+                                add.Directories.Insert(0, l);
+                            }
                             line = $"{dir.Groups[1].Value}<AdditionalIncludeDirectories>{add.ToString()}</AdditionalIncludeDirectories>";
                             break;
                         }
@@ -117,7 +120,10 @@ namespace VCXProjInterface.LibraryAdder
                         {
                             var add = new AdditionalIncludeDir();
                             foreach (var include in lib.Configurations[i].IncludePaths)
-                                add.Directories.Insert(0, Path.Combine(libDir, include));
+                            {
+                                var l = Path.Combine(lib.LibraryPath, include);
+                                add.Directories.Insert(0, l);
+                            }
                             line = $"\t\t\t<AdditionalIncludeDirectories>{add}</AdditionalIncludeDirectories>\n{line}";
                             break;
                         }
@@ -134,7 +140,10 @@ namespace VCXProjInterface.LibraryAdder
                             var dir = Regex.Match(line, "(\\s+)<AdditionalLibraryDirectories>(.+)</AdditionalLibraryDirectories>");
                             var add = new AdditionalLibraryDir(dir.Groups[2].Value);
                             foreach (var libPath in lib.Configurations[i].LibPaths)
-                                add.Directories.Insert(0, Path.Combine(libDir, libPath));
+                            {
+                                var l = Path.Combine(lib.LibraryPath, libPath);
+                                add.Directories.Insert(0, l);
+                            }
                             line = $"{dir.Groups[1].Value}<AdditionalLibraryDirectories>{add.ToString()}</AdditionalLibraryDirectories>";
                             break;
                         }
@@ -148,7 +157,10 @@ namespace VCXProjInterface.LibraryAdder
                         {
                             var add = new AdditionalLibraryDir();
                             foreach (var libPath in lib.Configurations[i].LibPaths)
-                                add.Directories.Insert(0, Path.Combine(libDir, libPath));
+                            {
+                                var l = Path.Combine(lib.LibraryPath, libPath);
+                                add.Directories.Insert(0, l);
+                            }
 
                             line = $"\t\t\t<AdditionalLibraryDirectories>{add}</AdditionalLibraryDirectories>\n{line}";
                             //line = add.ToString() + "\n" + line;

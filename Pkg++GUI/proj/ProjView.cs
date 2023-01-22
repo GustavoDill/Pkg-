@@ -73,7 +73,9 @@ namespace Pkg__
                 if (HasLib(to_remove) == false) continue;
                 lib_manager.RemoveLib(project_path, to_remove, ref currentProj, depDir);
             }
+
             FolderCopyForm copier = null;
+
             foreach (var to_install in install)
             {
                 if (HasLib(to_install)) continue;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LibraryCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 	<Library Name="wxWidgets" Version="3.2.1">
-		<LibraryPath>C:\libs\wxWidgets-3.2.1\pkg_mgr</LibraryPath>
+		<LibraryPath>C:\libs\wxWidgets-3.2.1</LibraryPath>
 		<Configuration Platform="Win32">
 			<LibPath>lib\vc_lib</LibPath>
 			<IncludePath>include\msvc</IncludePath>

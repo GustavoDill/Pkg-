@@ -11,7 +11,7 @@ namespace VCXProjInterface.LibraryAdder
 {
     public static class LibraryAdder
     {
-        public static void RemoveLibraryFromFile(this string projectPath, Library lib, string libDir)
+        public static void RemoveLibraryFromFile(this string projectPath, Library lib, string libDir = null)
         {
             StreamReader reader = new StreamReader(File.OpenRead(projectPath));
             if (File.Exists(projectPath + "_mod.vcxproj"))
@@ -76,7 +76,7 @@ namespace VCXProjInterface.LibraryAdder
             File.Delete(projectPath);
             File.Move(projectPath + "_mod.vcxproj", projectPath);
         }
-        public static void AddLibraryToFile(this string projectPath, Library lib, string libDir)
+        public static void AddLibraryToFile(this string projectPath, Library lib, string libDir = null)
         {
             StreamReader reader = new StreamReader(File.OpenRead(projectPath));
             if (File.Exists(projectPath + "_mod.vcxproj"))

@@ -8,10 +8,11 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Pkg__</RootNamespace>
     <AssemblyName>Pkg++</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -55,7 +56,11 @@
     <ProjectReference Include="..\VCXProj\VCXProjInterface.csproj">
       <Project>{ab96fdfb-4ce3-4417-90ce-ac2e788ee19a}</Project>
       <Name>VCXProjInterface</Name>
+      <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="VCXProjInterface.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -20,6 +20,7 @@ namespace VCXProjInterface
                 LibraryPath == selectedLib.LibraryPath);
         }
 
+
         public struct LibConfig
         {
 

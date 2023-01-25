@@ -173,8 +173,6 @@ namespace Pkg__
 
 
 
-            Console.WriteLine("Solution: " + SolutionFile);
-            return 0;
         }
 
 

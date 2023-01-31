@@ -24,6 +24,20 @@ namespace Pkg__
     {
         public static string[] args;
         public static string ARG_NAME_MARKER = "-";
+        public static bool HasArg(string argName, bool ignoreCase = true)
+        {
+            for (int i = 1; i < args.Length; i++)
+            {
+                if (args[i].StartsWith(ARG_NAME_MARKER))
+                {
+                    if (string.Compare(args[i].Substring(ARG_NAME_MARKER.Length), argName, ignoreCase) == 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
         public static string GetArg(string argName, bool ignoreCase = true)
         {
             for (int i = 1; i < args.Length; i++)
@@ -51,7 +65,7 @@ namespace Pkg__
 
     }
 
-    internal class Program
+    public class Program
     {
         static Program()
         {
@@ -86,144 +100,23 @@ namespace Pkg__
 #endif
                 return 0;
             }
+            if (args[0] == "delete")
+            {
+                return LibManager.Delete();
+            }
+
             if (args[0] == "add")
             {
-                var name = CONSOLE.GetArg("name");
-                var path = CONSOLE.GetArg("path");
-                var version = CONSOLE.GetArg("version");
-                var collection = LibraryCollection.Load(LOAD_LIBS);
-                var l = collection.Libraries.ToList();
-                
-                if (name == null ||
-                    path == null ||
-                    version == null)
-                {
-                    Console.WriteLine("Invalid arguments");
-                    return -1;
-                }
-                int libraryIndex = -1;
-                for (int i = 0; i < collection.Libraries.Length; i++)
-                {
-                    Library lib = collection.Libraries[i];
-                    if ( lib.Name == name)
-                    {
-                        if (CONSOLE.GetArg("force") == null)
-                        {
-                            Console.WriteLine("Library already exists. Overwrite (y/n):");
-                            char c = Console.ReadKey().KeyChar;
-                            Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
-                            if (c != 'y' && c != 'Y')
-                            {
-                                Console.WriteLine("Aborted");
-                                return -1;
-                            }
-                        }
-                        Console.WriteLine("Updating library...");
-                        libraryIndex = i;
-                        //l[i] = null;
-                        break;
-                    }
-                }
-                if (libraryIndex == -1)
-                {
-                    libraryIndex = collection.Libraries.Length;
-                    l.Add(null); // now libraryIndex is valid index and is last index.
-                }
-
-
-                var configs = new List<Library.LibConfig>();
-                for (int i = 0; i < args.Length; i++)
-                {
-                    if (args[i].StartsWith("-config"))
-                    {
-                        // add -config x64 ["include", "include\msvc"] ["libPaths";"separated like this"]
-
-                        var m = Regex.Match(args[i + 2], @"\[([\s\w\\;\.]+)\]");
-                        var m2 = Regex.Match(args[i + 3], @"\[([\s\w\\;\.]+)\]");
-                        if (m.Success ==false || m2.Success==false) { Console.WriteLine("Invalid arguments"); return -1; }
-
-                        string[] includePaths = m.Groups[1].Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                        string[] libPaths = m2.Groups[1].Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-
-                        configs.Add(new()
-                        {
-                            Platform = args[i + 1],
-                            LibPaths = libPaths,
-                            IncludePaths = includePaths
-                        });
-                        i += 2;
-                        
-                    }
-                }
-
-
-
-                if (CONSOLE.GetArg("copy") != null)
-                {
-
-                    var newPath = Path.Combine(new FileInfo(LOAD_LIBS).DirectoryName, name + "-" + version);
-                    if (Directory.Exists(newPath))
-                    {
-                        if (CONSOLE.GetArg("force") == null)
-                        {
-                            Console.WriteLine("Library directory already exists. Overwrite (y/n):");
-                            char c = Console.ReadKey().KeyChar;
-                            Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
-                            if (c != 'y' && c != 'Y')
-                            {
-                                Console.WriteLine("Aborted");
-                                return 0;
-                            }
-                        }
-                        Console.WriteLine("Deleting old library...");
-                        Directory.Delete(newPath, true);
-
-
-                    }
-                    try { Console.WriteLine("Copying library..."); CopyDirectoryRecursive(new DirectoryInfo(path), new DirectoryInfo(newPath)); } catch { Console.WriteLine("Failed to copy library directory"); return -1; }
-                    path = newPath;
-                }
-                var addLib = new Library()
-                {
-                    Name = name,
-                    LibraryPath = path,
-                    Version = version,
-                };
-
-
-                addLib.Configurations = configs.ToArray();
-                l[libraryIndex] = addLib;
-                collection.Libraries = l.ToArray();
-                collection.Save(LOAD_LIBS);
-
-
-
-                Console.WriteLine("Library added successfully!");
-#if DEBUG
-#if true
-                Console.ReadKey();
-#endif
-#endif
-                return 0;
+                return LibManager.Add();
             }
-            else if (args[0] == "add" && CONSOLE.GetArg("gui") != null)
+            else if (args[0] == "add" && CONSOLE.HasArg("gui"))
             {
-
+                Console.WriteLine("Function not avaliable yet!");
                 return 0;
             }
-
-
-#if _DEBUG
-            return 0;
-#endif
             libraries = LibraryCollection.Load(LOAD_LIBS).Libraries;
             if (IsSolution(args))
             {
-#if DEBUG
-#else
-                return 
-#endif
-
                 new OnSolutionDir()
                 {
                     SolutionFile = CONSOLE.GetArg("s")
@@ -298,35 +191,38 @@ namespace Pkg__
 
         static bool IsSolution(string[] args)
         {
-            return CONSOLE.GetArg("s") != null;
+            return CONSOLE.HasArg("s");
         }
 
 
         public static void Help()
         {
-            Console.WriteLine("Usage: <pkg++> <args>");
+            Console.WriteLine("Usage:\npkg++ <add/delete install/remove list> [args]\n");
+            MainArg("add", "Adds a library to the avaliable library list. Takes <name> <version> <path> [copy] [force]");
+            MainArg("delete", "Deletes a library from the avaliable library list. Takes <name>");
+            MainArg("install", "Installs a library in a C++ project. Takes <name>");
+            MainArg("remove", "Removes a library from a C++ project. Takes <name>");
+            MainArg("list", "Lists the avaliable libraries");
+            Console.WriteLine("");
+            Arg("name", "Targets the name of the library");
+            Arg("version", "Defines the library version");
+            Arg("path", "Defines the library path to copy from");
+            Arg("copy", "Defines that it must copy the library from 'path'");
+            Arg("force", "Remove prompts");
+            
         }
 
-        static string RelPath(DirectoryInfo rootSrc, DirectoryInfo dest, string current)
+        public static void MainArg(string name, string desc)
         {
-            // C:\source\folder\tocopy\
-            // C:\libs\dest
-            // C:\source\folder\tocopy\some\other\folder
-            return Path.Combine(
-                dest.FullName,
-                current.Substring(rootSrc.FullName.Length + 1)
-                );
+            Console.WriteLine("\t{0}\t:\t{1}", name, desc);
+            //Console.ReadKey();
         }
-        static void CopyDirectoryRecursive(DirectoryInfo src, DirectoryInfo dest)
+
+        public static void Arg(string name, string desc)
         {
-            foreach (var d in src.GetDirectories("*", SearchOption.AllDirectories))
-            {
-                Directory.CreateDirectory(RelPath(src, dest, d.FullName));
-            }
-            foreach (var f in src.GetFiles("*", SearchOption.AllDirectories))
-            {
-                f.CopyTo(RelPath(src, dest, f.FullName));
-            }
+            Console.WriteLine("\t{0}\t:\t{1}", name, desc);
+            
         }
+
     }
 }

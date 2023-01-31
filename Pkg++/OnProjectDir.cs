@@ -99,13 +99,6 @@ namespace Pkg__
         }
         public int Main()
         {
-            //if (File.Exists(SolutionFile)) solution = new Solution(SolutionFile);
-            //else
-            //{
-            //    Console.WriteLine("Solution file not found!");
-            //    return -1;
-            //}
-            // Get param "--install" or "--remove" to decide along with the library
 
             string proj = projectPath;
             string op = CONSOLE.args[0]; // first argument is always operation

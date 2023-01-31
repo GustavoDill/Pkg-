@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LibManager.cs" />
     <Compile Include="OnProjectDir.cs" />
     <Compile Include="OnSolutionDir.cs" />
     <Compile Include="Program.cs" />

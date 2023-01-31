@@ -166,10 +166,6 @@ namespace Pkg__
 
             Console.WriteLine(message);
             return return_value;
-            // Use Operation.Invalid if none;
-
-            // Check if --project-name exists, then select that project
-            // (depracated) else, Print solution projects and allow choice. (with option for all i guess)
 
 
 
